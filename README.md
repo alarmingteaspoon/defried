@@ -1,4 +1,4 @@
 https://sight-text.vercel.app/
 
-# Clari.md - documents through a new lens
+# Clarity - documents through a new lens
 
