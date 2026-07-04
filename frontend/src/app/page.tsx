@@ -40,6 +40,13 @@ type Result = DocumentResult | AnkiResult;
 
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
+type ReaderFont = "verdana" | "opendyslexic";
+
+const READER_FONTS: Record<ReaderFont, string> = {
+  verdana: "Verdana, Arial, sans-serif",
+  opendyslexic: '"OpenDyslexic", Verdana, Arial, sans-serif',
+};
+
 function saveDownload(download: Download) {
   const bytes = Uint8Array.from(atob(download.data_b64), (c) => c.charCodeAt(0));
   const blob = new Blob([bytes], { type: download.media_type });
@@ -66,7 +73,20 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [showHow, setShowHow] = useState(false);
+  const [readerFont, setReaderFont] = useState<ReaderFont>("verdana");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fontToggle = (
+    <button
+      className={styles.ghostButton}
+      onClick={() =>
+        setReaderFont(readerFont === "verdana" ? "opendyslexic" : "verdana")
+      }
+      title="Switch the reading font"
+    >
+      font: {readerFont === "verdana" ? "Verdana" : "OpenDyslexic"}
+    </button>
+  );
 
   const pickFile = (picked: File | null | undefined) => {
     if (!picked) return;
@@ -328,6 +348,7 @@ export default function Home() {
                 {result.title} · {result.mode} transformation
               </span>
               <span className={styles.resultActions}>
+                {fontToggle}
                 <button
                   className={styles.actionButton}
                   onClick={() => saveDownload(result.download)}
@@ -339,7 +360,10 @@ export default function Home() {
                 </button>
               </span>
             </div>
-            <article className={styles.reader}>
+            <article
+              className={styles.reader}
+              style={{ fontFamily: READER_FONTS[readerFont] }}
+            >
               {result.blocks.map((block, i) => {
                 switch (block.type) {
                   case "heading":
@@ -376,6 +400,7 @@ export default function Home() {
                 {result.mode} transformation
               </span>
               <span className={styles.resultActions}>
+                {fontToggle}
                 <button
                   className={styles.actionButton}
                   onClick={() => saveDownload(result.download)}
@@ -392,7 +417,11 @@ export default function Home() {
             </p>
             <div className={styles.cardPreviewList}>
               {result.preview.map((card, i) => (
-                <div key={i} className={styles.flashcard}>
+                <div
+                  key={i}
+                  className={styles.flashcard}
+                  style={{ fontFamily: READER_FONTS[readerFont] }}
+                >
                   <div className={styles.flashFront}>{card.front}</div>
                   {card.back && (
                     <div className={styles.flashBack}>{card.back}</div>
